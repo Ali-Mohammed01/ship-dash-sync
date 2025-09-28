@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - نظام شحنات الوقود</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="bi bi-fuel-pump me-2"></i>
+                نظام شحنات الوقود
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html">لوحة التحكم</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="company.html">إدارة الشركة</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="driver.html">لوحة السائق</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h6 class="text-muted">نظام شحنات الوقود</h6>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="openCreateModal()">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                إنشاء طلب جديد
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showRatings()">
+                                <i class="bi bi-star me-2"></i>
+                                التقييمات
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="company.html">
+                                <i class="bi bi-building me-2"></i>
+                                بوابة الشركة
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="driver.html">
+                                <i class="bi bi-person-workspace me-2"></i>
+                                بوابة السائق
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">لوحة تحكم شحنات الوقود</h1>
+                </div>
+
+                <!-- Requests Container -->
+                <div id="requestsContainer">
+                    <div id="emptyState" class="text-center py-5" style="display: none;">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                        <h3 class="text-muted mt-3">لا توجد طلبات شحن بعد</h3>
+                        <p class="text-muted">أنشئ طلبك الأول للبدء</p>
+                        <button class="btn btn-primary" onclick="openCreateModal()">
+                            <i class="bi bi-plus me-2"></i>
+                            إنشاء طلب جديد
+                        </button>
+                    </div>
+                    
+                    <div id="requestsList" class="row g-3">
+                        <!-- Requests will be loaded here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Create Request Modal -->
+    <div class="modal fade" id="createRequestModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">إنشاء طلب شحنة وقود جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createRequestForm">
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">الكمية المطلوبة (لتر)</label>
+                            <input type="number" class="form-control" id="quantity" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fuelType" class="form-label">نوع الوقود</label>
+                            <select class="form-select" id="fuelType" required>
+                                <option value="">اختر نوع الوقود</option>
+                                <option value="90">90 أوكتان</option>
+                                <option value="91">91 أوكتان</option>
+                                <option value="Diesel">ديزل</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tankCapacity" class="form-label">سعة خزان المركبة (لتر)</label>
+                            <input type="number" class="form-control" id="tankCapacity" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="targetStation" class="form-label">المحطة المستهدفة</label>
+                            <select class="form-select" id="targetStation" required>
+                                <option value="">اختر المحطة المستهدفة</option>
+                                <option value="Downtown Station Alpha">محطة وسط المدينة ألفا</option>
+                                <option value="Highway Service Center Beta">مركز خدمة الطريق السريع بيتا</option>
+                                <option value="Industrial District Gamma">منطقة الصناعية غاما</option>
+                                <option value="Suburban Hub Delta">مركز الضواحي دلتا</option>
+                                <option value="Airport Terminal Epsilon">محطة المطار إبسيلون</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">عنوان المحطة/الوصف</label>
+                            <textarea class="form-control" id="description" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="submitRequest()">المتابعة للدفع</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

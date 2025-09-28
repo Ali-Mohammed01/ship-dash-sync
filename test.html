@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار النظام</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container py-4">
+        <h1>اختبار نظام شحنات الوقود</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>اختبار البيانات</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" onclick="testData()">اختبار البيانات</button>
+                        <button class="btn btn-success" onclick="testPayment()">اختبار الدفع</button>
+                        <button class="btn btn-warning" onclick="testWorkflow()">اختبار دورة العمل</button>
+                        <button class="btn btn-info" onclick="clearData()">مسح البيانات</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>النتائج</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="testResults"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="index.html" class="btn btn-secondary">العودة للصفحة الرئيسية</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    
+    <script>
+        function testData() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '<div class="alert alert-info">جاري الاختبار...</div>';
+            
+            setTimeout(() => {
+                const saved = localStorage.getItem('shipmentRequests');
+                let requests = [];
+                if (saved) {
+                    requests = JSON.parse(saved);
+                }
+                
+                if (window.FuelShipmentSystem) {
+                    results.innerHTML = `
+                        <div class="alert alert-success">
+                            <h6>✅ النظام يعمل بشكل صحيح</h6>
+                            <p>عدد الطلبات في localStorage: ${requests.length}</p>
+                            <p>عدد الطلبات في النظام: ${window.FuelShipmentSystem.shipmentRequests.length}</p>
+                            <p>الوظائف المتاحة: ${Object.keys(window.FuelShipmentSystem).join(', ')}</p>
+                            ${requests.length > 0 ? `
+                                <h6>الطلبات الموجودة:</h6>
+                                <ul>
+                                    ${requests.map(req => `<li>${req.id} - ${req.status}</li>`).join('')}
+                                </ul>
+                            ` : ''}
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML = '<div class="alert alert-danger">❌ النظام غير متاح</div>';
+                }
+            }, 1000);
+        }
+        
+        function testPayment() {
+            const testData = {
+                quantity: 100,
+                fuelType: '90',
+                tankCapacity: 200,
+                targetStation: 'محطة الاختبار',
+                description: 'عنوان الاختبار'
+            };
+            
+            if (window.FuelShipmentSystem && window.FuelShipmentSystem.processPayment) {
+                window.FuelShipmentSystem.processPayment(testData, function(result) {
+                    document.getElementById('testResults').innerHTML = `
+                        <div class="alert alert-success">
+                            <h6>✅ اختبار الدفع نجح</h6>
+                            <p>تم إنشاء طلب: ${result.id}</p>
+                            <p>الحالة: ${result.status}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                document.getElementById('testResults').innerHTML = '<div class="alert alert-danger">❌ دالة الدفع غير متاحة</div>';
+            }
+        }
+        
+        function testWorkflow() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '<div class="alert alert-info">جاري اختبار دورة العمل الكاملة...</div>';
+            
+            // Create test request
+            const testData = {
+                quantity: 150,
+                fuelType: 'Diesel',
+                tankCapacity: 300,
+                targetStation: 'محطة اختبار دورة العمل',
+                description: 'اختبار دورة العمل الكاملة'
+            };
+            
+            if (window.FuelShipmentSystem && window.FuelShipmentSystem.processPayment) {
+                window.FuelShipmentSystem.processPayment(testData, function(result) {
+                    setTimeout(() => {
+                        // Simulate company accepting
+                        if (window.FuelShipmentSystem.updateRequestStatus) {
+                            window.FuelShipmentSystem.updateRequestStatus(result.id, 'Accepted');
+                            
+                            setTimeout(() => {
+                                // Simulate driver receiving
+                                window.FuelShipmentSystem.updateRequestStatus(result.id, 'Received');
+                                
+                                setTimeout(() => {
+                                    // Simulate driver delivering
+                                    window.FuelShipmentSystem.updateRequestStatus(result.id, 'Delivered');
+                                    
+                                    setTimeout(() => {
+                                        // Simulate customer confirming
+                                        window.FuelShipmentSystem.updateRequestStatus(result.id, 'Confirmed');
+                                        
+                                        results.innerHTML = `
+                                            <div class="alert alert-success">
+                                                <h6>✅ اختبار دورة العمل نجح</h6>
+                                                <p>تم اختبار جميع المراحل:</p>
+                                                <ul>
+                                                    <li>إنشاء الطلب ✅</li>
+                                                    <li>قبول الشركة ✅</li>
+                                                    <li>استلام السائق ✅</li>
+                                                    <li>تسليم السائق ✅</li>
+                                                    <li>تأكيد العميل ✅</li>
+                                                </ul>
+                                            </div>
+                                        `;
+                                    }, 2000);
+                                }, 2000);
+                            }, 2000);
+                        }
+                    }, 2000);
+                });
+            } else {
+                results.innerHTML = '<div class="alert alert-danger">❌ النظام غير متاح</div>';
+            }
+        }
+        
+        function clearData() {
+            localStorage.removeItem('shipmentRequests');
+            if (window.FuelShipmentSystem) {
+                window.FuelShipmentSystem.shipmentRequests = [];
+            }
+            document.getElementById('testResults').innerHTML = '<div class="alert alert-warning">تم مسح البيانات</div>';
+        }
+    </script>
+</body>
+</html>
